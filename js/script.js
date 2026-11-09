@@ -157,37 +157,24 @@
     openModal(lightbox);
   }));
 
-  // Story cards reveal the exact supplied text, unchanged.
+  // Story cards: data is defined locally in this file so it cannot be missing
+  // because of an outdated or cached index.html.
+  const scrapbookStories = [{"title": "Until we meet again 🤍", "message": "I don't know when we'll sit together, laugh, gossip and make new memories again. But I hope distance never changes us. Until we meet again, take care of yourself and keep making beautiful memories.\n\nHappy birthday, Angel. I'm so lucky to have you.\n\nLove you always"}, {"title": "The day you called me back", "message": "We had a silly fight, and I was already on my bus home. But you called and asked me to get down at the next stop. And I did. We ended up crying in a mall toilet, reminding each other how much we meant to one another."}, {"title": "Just us, until midnight", "message": "We were both at our lowest, but somehow we had each other. We texted until midnight, counted down together and welcomed the new year. We weren't having the happiest time, but we made sure neither of us felt alone."}];
   const storyModal = $('#storyModal');
-  function unfoldStory(card) {
-    const stories = Array.isArray(window.scrapbookStories) ? window.scrapbookStories : [];
-    const story = stories[Number(card.dataset.story)];
-    if (!story || !storyModal) {
-      notify('This memory could not be opened. Please refresh the page ♡');
-      return;
-    }
-    const title = $('#storyModalTitle');
-    const message = $('#storyModalText');
-    if (!title || !message) return;
-    title.textContent = story.title;
-    message.textContent = story.message;
-    openModal(storyModal);
-  }
   $$('.story-card').forEach(card => {
-    card.addEventListener('click', () => unfoldStory(card));
-    card.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        unfoldStory(card);
+    card.addEventListener('click', () => {
+      const storyIndex = Number(card.dataset.story);
+      const story = scrapbookStories[storyIndex];
+      const title = $('#storyModalTitle');
+      const message = $('#storyModalText');
+      if (!story || !storyModal || !title || !message) {
+        notify('Sorry, this letter could not be opened. Please reload the page ♡');
+        return;
       }
+      title.textContent = story.title;
+      message.textContent = story.message;
+      openModal(storyModal);
     });
-  });
-  $$('.modal').forEach(modal => {
-    $('.modal-close', modal)?.addEventListener('click', () => closeModal(modal));
-    modal.addEventListener('click', e => { if (e.target === modal) closeModal(modal); });
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') $$('.modal.open').forEach(closeModal);
   });
 
   // Personal envelope
